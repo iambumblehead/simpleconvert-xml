@@ -1,5 +1,5 @@
 // Filename: simpleConvertXML.js  
-// Timestamp: 2013.04.11-21:40:17 (last modified)  
+// Timestamp: 2013.04.14-02:37:40 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)  
 
 var simpleConvertXML = module.exports = (function () {
@@ -109,9 +109,18 @@ var simpleConvertXML = module.exports = (function () {
       }
 
       function getXMLAsObj(node) {
-        var nodeName, nodeType, strObj = "", finObj = {}, isStr = true;
+        var nodeName, nodeType, 
+            strObj = "", finObj = {}, isStr = true, x,
+            attr;
 
         if (node && node.hasChildNodes()) {
+          if (node.attributes) {
+            for (x = node.attributes.length; x--;) {
+              attr = node.attributes[x];
+              finObj[attr.name] = attr.nodeValue; 
+            }
+          }
+
           node = node.firstChild;
           do {
             nodeType = node.nodeType;
