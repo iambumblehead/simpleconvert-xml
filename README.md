@@ -56,7 +56,7 @@ simpleTime may be downloaded directly or installed through `npm`.
  > ```javascript
    var DOMParser = require('xmldom').DOMParser,
        simpleConvertXML = require('simpleConvertXML');  
-  
+   
    xmlNode = new DOMParser().parseFromString(xmlFormattedStr);
    obj = simpleConvertXML.getXMLAsObj(xmlNode);
    console.log(obj);
@@ -73,12 +73,15 @@ simpleTime may be downloaded directly or installed through `npm`.
 #### <a id="methods">METHODS:   
       
  - **getXMLAsObj( _xmlNode_ )**        
-   convert an object into an xml string
+   convert an xml node into an object
+   
+   notice `fooArr`, its property-name is affixed with `Arr`. As a result `fooArr` is defined as an array on the resulting object.
    
    ```javascript
    var SimpleConvertXML = require('simpleConvertXML'),
        DOMParser = require('xmldom').DOMParser;
-   var xmlNode, testXMLStr = "" +
+   
+   var testXMLStr = "" +
      "<data>\n" +
      "  <price>$15.98</price>\n" +
      "  <happy>\n" +
@@ -87,8 +90,12 @@ simpleTime may be downloaded directly or installed through `npm`.
      "    <conclude>we're all happy</conclude>\n" +
      "  </happy>\n" +
      "  <isFinal>true</isFinal>\n" +
+     "  <name>dave</name>\n" +
+     "  <name>chris</name>\n" +
+     "  <fooArr>value</fooArr>\n" +     
      "</data>";  
-   xmlNode = new DOMParser().parseFromString(testXMLStr);
+     
+   var xmlNode = new DOMParser().parseFromString(testXMLStr);
    console.log(SimpleConvertXML.getXMLAsObj(testDoc));    
    // { 
    //   data : { 
@@ -98,13 +105,49 @@ simpleTime may be downloaded directly or installed through `npm`.
    //       respond: 'you\'re happy',
    //       conclude: 'we\'re all happy' 
    //     },
-   //     isFinal: 'true' 
+   //     isFinal: 'true',
+   //     name : ['dave', 'chris'],
+   //     fooArr : ['value']   
    //   } 
    // };   
    ```
  
  - **getObjAsXMLstr( _object_ )**           
-   boolean, is the given date object a valid date object?   
+   convert an object into an xml string
+   
+   ```javascript
+   var SimpleConvertXML = require('simpleConvertXML');
+   
+   var obj = {
+     data : { 
+       price: '$15.98',
+       happy: { 
+         type : 'type1',
+         say: 'I\'m happy',
+         respond: 'you\'re happy',
+         conclude: 'we\'re all happy' 
+       },
+       isFinal: 'true',
+       foobarArr: ['foo', 'bar']
+     }    
+   }
+   
+   console.log(SimpleConvertXML.getObjAsXMLstr(obj));    
+   // "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+   // "<data>\n" +
+   // "<price>$15.98</price>\n" +
+   // "<happy>\n" +
+   // "<type>type1</type>\n" +
+   // "<say>I'm happy</say>\n" +
+   // "<respond>you're happy</respond>\n" +
+   // "<conclude>we're all happy</conclude>\n" +
+   // "</happy>\n" +
+   // "<isFinal>true</isFinal>\n" +
+   // "<foobarArr>foo</foobarArr>\n" +
+   // "<foobarArr>bar</foobarArr>\n" +
+   // "</data>\n";   
+   ```
+   
       
 ---------------------------------------------------------
 #### <a id="license">License:

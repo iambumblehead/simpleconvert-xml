@@ -1,30 +1,32 @@
 // Filename: simpleConvertXML.js  
-// Timestamp: 2013.04.14-02:37:40 (last modified)  
+// Timestamp: 2013.04.28-10:46:23 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)  
 
 var simpleConvertXML = module.exports = (function () {
-// ELEMENT_NODE                :  1,
-// ATTRIBUTE_NODE              :  2,
-// TEXT_NODE                   :  3,
-// CDATA_SECTION_NODE          :  4,
-// ENTITY_REFERENCE_NODE       :  5,
-// ENTITY_NODE                 :  6,
-// PROCESSING_INSTRUCTION_NODE :  7,
-// COMMENT_NODE                :  8,
-// DOCUMENT_NODE               :  9,
-// DOCUMENT_TYPE_NODE          : 10,
-// DOCUMENT_FRAGMENT_NODE      : 11,
-// NOTATION_NODE               : 12
+  // ELEMENT_NODE                :  1,
+  // ATTRIBUTE_NODE              :  2,
+  // TEXT_NODE                   :  3,
+  // CDATA_SECTION_NODE          :  4,
+  // ENTITY_REFERENCE_NODE       :  5,
+  // ENTITY_NODE                 :  6,
+  // PROCESSING_INSTRUCTION_NODE :  7,
+  // COMMENT_NODE                :  8,
+  // DOCUMENT_NODE               :  9,
+  // DOCUMENT_TYPE_NODE          : 10,
+  // DOCUMENT_FRAGMENT_NODE      : 11,
+  // NOTATION_NODE               : 12
+
+  function isArray (obj) {
+    if (typeof obj === 'object' && obj) {
+      if (!(obj.propertyIsEnumerable('length'))) {
+        return typeof obj.length === 'number';
+      }
+    }
+    return false;
+  }
 
   return {
-    isArray : function (obj) {
-      if (typeof obj === 'object' && obj) {
-        if (!(obj.propertyIsEnumerable('length'))) {
-          return typeof obj.length === 'number';
-        }
-      }
-      return false;
-    },
+    isArray : isArray,
 
     // input:                               output:
     //  data = {                             <data>
@@ -38,27 +40,49 @@ var simpleConvertXML = module.exports = (function () {
     //  }                                    </data>
     //
     getObjAsXMLstr : function (data) {
-      var xmlStr;
+      var xmlStr = '<?xml version="1.0" encoding="UTF-8"?>\n',
+          nodeParentStr = '<:name>\n:v<\/:name>\n',
+          nodeLeafStr = '<:name>:v<\/:name>\n';
+
+      function getAsNodeLeaf(name, content) {
+        return nodeLeafStr
+          .replace(/:name/g, name)
+          .replace(/:v/, getNodeTree(content));      
+      }
+
+      function getAsNodeParent(name, content) {
+        return nodeParentStr
+          .replace(/:name/g, name)
+          .replace(/:v/, getNodeTree(content));            
+      }
+
+      function getNode(name, content) {
+        if (isArray(content)) {
+          return content.map(function (p) {
+            return getNode(name, p);
+          }).join('');          
+        } else if (typeof content === 'object') {
+          return getAsNodeParent(name, content);
+        } else if (typeof content === 'string') {
+          return getAsNodeLeaf(name, content);            
+        }
+      }
 
       function getNodeTree(obj) {
         var xmlStr = "";
-        if (obj) {
-          if (typeof obj === "object") {
-            for (var name in obj) {
-              xmlStr += '<' + name + '>' + getNodeTree(obj[name]) + '</' + name + '>\n';
-            }
-          } else {
-            xmlStr += obj.toString();
-          }
+
+        if (obj && typeof obj === "object") {
+          for (var name in obj) {
+            xmlStr += getNode(name, obj[name]);
+          } 
+        } else if (typeof obj === 'string') {
+          xmlStr += obj.toString();
         }
+
         return xmlStr;
       }
 
-      xmlStr = "";
-      xmlStr += '<?xml version="1.0" encoding="UTF-8"?>\n';
-      xmlStr += '<data>\n';
       xmlStr += getNodeTree(data);
-      xmlStr += '</data>';
 
       return xmlStr;
     },
@@ -71,21 +95,16 @@ var simpleConvertXML = module.exports = (function () {
     // input:                              output:
     //  <data>                               data = {
     //    <price>$15.87</price>                price : "$15.87",
-    //    <updateHTML>                         updateHTML : "<p><b>html</b></p>",
-    //      <p>                                happy : {
-    //        <b>html</b>                        say      : "happy?",
-    //      </p>                                 respond  : "happy!",
-    //    </updateHTML>                          conclude : "HAPPY.",
-    //    <happy>                              },
-    //      <say>happy?</say>                  isFinal : "true",
-    //      <respond>happy!</respond>          name : ["chris", "dave"],
-    //      <conclude>HAPPY</conclude>         fooArr : [value]
-    //    </happy>                           }
-    //    <isFinal>true</isFinal>
-    //    <name>dave</name>
-    //    <name>chris</name>
-    //    <fooArr>value</fooArr>
-    //  </data>
+    //    <happy>                              happy : {
+    //      <say>happy?</say>                    say : "happy?",
+    //      <respond>happy!</respond>            respond : "happy!",
+    //      <conclude>HAPPY</conclude>           conclude : "HAPPY"
+    //    </happy>                             },
+    //    <isFinal>true</isFinal>              isFinal : "true",
+    //    <name>dave</name>                    name : ["chris",
+    //    <name>chris</name>                           "dave"],
+    //    <fooArr>value</fooArr>               fooArr : ["value"]
+    //  </data>                              }
     //
     getXMLAsObj : function (xmlObj) {
       var isArray = this.isArray;

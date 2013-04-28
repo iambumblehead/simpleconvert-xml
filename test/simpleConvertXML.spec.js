@@ -5,7 +5,7 @@ var SimpleConvertXML = require('../simpleConvertXML'),
 describe("SimpleConvertXML.getXMLAsObj", function () {
   var result, resultExpected;
 
-  it("should do something", function () {
+  it("should convert an xml node into an object", function () {
     var testDoc, testXMLStr = "" +
           "<data>\n" +
           "  <price>$15.98</price>\n" +
@@ -15,6 +15,9 @@ describe("SimpleConvertXML.getXMLAsObj", function () {
           "    <conclude>we're all happy</conclude>\n" +
           "  </happy>\n" +
           "  <isFinal>true</isFinal>\n" +
+          "  <name>dave</name>\n" +
+          "  <name>chris</name>\n" +
+          "  <fooArr>value</fooArr>\n" +
           "</data>";
     
     resultExpected = { 
@@ -25,7 +28,9 @@ describe("SimpleConvertXML.getXMLAsObj", function () {
           respond: 'you\'re happy',
           conclude: 'we\'re all happy' 
         },
-        isFinal: 'true' 
+        isFinal: 'true',
+        name : ['dave', 'chris'],
+        fooArr : ['value']
       } 
     };
 
@@ -81,4 +86,42 @@ describe("SimpleConvertXML.getXMLAsObj", function () {
   });
 });
 
+describe("SimpleConvertXML.getObjAsXMLstr", function () {
+  var result, resultExpected;
 
+  it("should convert an object into an xml-like str", function () {
+    var testObj = { 
+      data : { 
+        price: '$15.98',
+        happy: { 
+          type : 'type1',
+          say: 'I\'m happy',
+          respond: 'you\'re happy',
+          conclude: 'we\'re all happy' 
+        },
+        isFinal: 'true',
+        foobarArr: ['foo', 'bar']
+      } 
+    };
+
+    result = SimpleConvertXML.getObjAsXMLstr(testObj);    
+
+    resultExpected = "" +
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+      "<data>\n" +
+      "<price>$15.98</price>\n" +
+      "<happy>\n" +
+      "<type>type1</type>\n" +
+      "<say>I'm happy</say>\n" +
+      "<respond>you're happy</respond>\n" +
+      "<conclude>we're all happy</conclude>\n" +
+      "</happy>\n" +
+      "<isFinal>true</isFinal>\n" +
+      "<foobarArr>foo</foobarArr>\n" +
+      "<foobarArr>bar</foobarArr>\n" +
+      "</data>\n";
+
+    expect( result ).toBe( resultExpected );
+  });
+
+});
