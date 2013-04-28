@@ -61,7 +61,7 @@ simpleTime may be downloaded directly or installed through `npm`.
    obj = simpleConvertXML.getXMLAsObj(xmlNode);
    console.log(obj);
    ```
-   
+
  > *browser environment*
 
  > ```javascript
