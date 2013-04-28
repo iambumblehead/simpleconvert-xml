@@ -53,21 +53,19 @@ simpleTime may be downloaded directly or installed through `npm`.
 
  > *node.js environment*
 
- > ```javascript
-   var DOMParser = require('xmldom').DOMParser,
-       simpleConvertXML = require('simpleConvertXML');  
-   
-   xmlNode = new DOMParser().parseFromString(xmlFormattedStr);
-   obj = simpleConvertXML.getXMLAsObj(xmlNode);
-   console.log(obj);
-   ```
+ ```javascript
+ var DOMParser = require('xmldom').DOMParser,
+     simpleConvertXML = require('simpleConvertXML');
+ 
+ xmlNode = new DOMParser().parseFromString(xmlFormattedStr);
+ obj = simpleConvertXML.getXMLAsObj(xmlNode);
+ ```
 
- > *browser environment*
-
- > ```javascript
-   obj = simpleConvertXML.getXMLAsObj(xmlNode);
-   console.log(obj);
-   ```   
+ *browser environment*
+ 
+ ```javascript
+ obj = simpleConvertXML.getXMLAsObj(xmlNode);
+ ```   
    
 ---------------------------------------------------------
 #### <a id="methods">METHODS:   
