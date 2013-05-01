@@ -13,10 +13,12 @@ What's good about simpleconvert-xml:
 
 It is not a comprehensive solution for xml conversion. See the examples below to find out what scenarious this script is best for.
 
+There are situations where useful mapping of xml to json is not possible. Notable problems have been found when converting the [ZEND locale][3] xml files. See the [problems](problems) section for more details.
+
 [0]: http://www.bumblehead.com                            "bumblehead"
 [1]: https://developers.google.com/gdata/docs/json    "gdata-standard"
 [2]: https://npmjs.org/package/xmldom                         "xmldom"
-
+[3]:https://github.com/magento/magento2/tree/master/lib/Zend/Locale/Data
 
 ---------------------------------------------------------  
 #### <a id="install"></a>INSTALL:
@@ -43,6 +45,96 @@ simpleTime may be downloaded directly or installed through `npm`.
  ```bash
  $ npm test
  ```
+
+---------------------------------------------------------
+#### <a id="problems">PROBLEMS:
+
+Documented problems related to the conversion of xml to json using this script. Simpeconvert-xml may be inadequate for your complex xml document.  
+
+ - Arrays. XML does not have these. Elements with multiple child nodes will produce an array, and a similar element with one node will not:
+ 
+ ```xml
+ <currencies>
+   <currency type="GNS">   
+     <displayName>syli guineano</displayName>
+   </currency>
+   <currency type="GNB">   
+     <displayName>syli guineano</displayName>
+     <displayName>other</displayName>
+   </currency>   
+ <currencies>
+ ```
+ 
+ ```json
+ "currencies" : {
+   "currency" : [
+     {
+       "displayName": "syli guineano",
+       "type": "GNS"
+     },     
+     {
+       "displayName": [      
+         "ekuele de Guinea Ecuatorial",      
+         "other"
+       ],
+       "type": "GNB"
+     }
+   ]
+ }
+ ```
+ 
+ If you control the source of the xml, you may flag the presence of an array by using a node name affixed with `Arr`, for example `displayNameArr`.
+
+
+ - multiple attributes on a node will create multiple definitions in the resulting JSON file.
+
+ ```xml
+ <types>
+   <type type="big5han" key="collation">orden del chino tradicional - Big5</type>
+   <type type="buddhist" key="calendar">calendario budista</type>     
+   ...
+ ``` 
+ 
+ ```json 
+ "types": {
+   "type": [
+     {
+       "collation": "orden del chino tradicional - Big5",
+       "big5han": "orden del chino tradicional - Big5"
+     },     
+     {
+       "calendar": "calendario budista",
+       "buddhist": "calendario budista"
+     },     
+     ...
+ ```
+
+
+ - nodes without a node value will have no final json definition
+ 
+ ```xml
+ <identity>
+   <version number="$Revision: 1.128 $"/>
+   <generation date="$Date: 2009/06/15 03:46:25 $"/>
+   <language type="es"/>
+ </identity>
+ ```  
+ 
+ ```json
+ "identity": {
+   "version": {
+     "$Revision: 1.128 $": ""
+   },
+   "generation": {
+     "$Date: 2009/06/15 03:46:25 $": ""
+   },
+   "language": {
+     "es": ""
+   }
+ }
+ ```
+
+
 
 ---------------------------------------------------------
 #### <a id="get-started">GET STARTED:
