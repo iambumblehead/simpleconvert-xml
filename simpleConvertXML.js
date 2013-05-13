@@ -1,5 +1,5 @@
 // Filename: simpleConvertXML.js  
-// Timestamp: 2013.04.28-10:46:23 (last modified)  
+// Timestamp: 2013.04.30-21:22:16 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)  
 
 var simpleConvertXML = module.exports = (function () {
@@ -127,46 +127,72 @@ var simpleConvertXML = module.exports = (function () {
         return finObj;
       }
 
+      // get a node's value redefined to accomodate
+      // attributes
+      function getWithAttributes(val, node) {
+        var attrArr = node.attributes, attr, x, newObj;
+        if (attrArr) {
+          if (isArray(val)) {
+            newObj = val;
+          } else if (typeof val === 'object') {
+            newObj = val;
+            for (x = attrArr.length; x--;) {
+              val[attrArr[x].name] = attrArr[x].nodeValue;
+            }                        
+          } else if (typeof val === 'string') {
+            if (attrArr.length) {
+              newObj = {};
+              for (x = attrArr.length; x--;) {
+                newObj[attrArr[x].nodeValue] = val;//attrArr[x].nodeValue;
+              }                                      
+            }
+          } else {
+            newObj = val;
+          }
+        }
+        return newObj || val;
+      }
+
       function getXMLAsObj(node) {
         var nodeName, nodeType, 
             strObj = "", finObj = {}, isStr = true, x,
-            attr;
+            attr, attrArr;
 
-        if (node && node.hasChildNodes()) {
-          if (node.attributes) {
-            for (x = node.attributes.length; x--;) {
-              attr = node.attributes[x];
-              finObj[attr.name] = attr.nodeValue; 
-            }
-          }
-
-          node = node.firstChild;
-          do {
-            nodeType = node.nodeType;
-            nodeName = node.nodeName;
-            if (nodeType === 1) {
-              isStr = false;
-              // if array trigger, make this an array
-              if (nodeName.match(/Arr\b/)) { 
-                finObj[nodeName] = getNodeAsArr(node);
-              } else if (finObj[nodeName]) { 
-                // if array already formed, push item to array
-                // else a repeated node, redefine this as an array
-                if (isArray(finObj[nodeName])) {
-                  finObj[nodeName].push(getXMLAsObj(node));
+        if (node) {
+          if (node.hasChildNodes()) {
+            node = node.firstChild;
+            do {
+              nodeType = node.nodeType;
+              nodeName = node.nodeName;
+              if (nodeType === 1) {
+                isStr = false;
+                // if array trigger, make this an array
+                if (nodeName.match(/Arr\b/)) { 
+                  finObj[nodeName] = getNodeAsArr(node);
+                } else if (finObj[nodeName]) { 
+                  // if array already formed, push item to array
+                  // else a repeated node, redefine this as an array
+                  if (isArray(finObj[nodeName])) {
+                    // if attribute... define on first attribute
+                    finObj[nodeName].push(
+                      getWithAttributes(getXMLAsObj(node), node)
+                    );
+                  } else {
+                    finObj[nodeName] = [finObj[nodeName]];
+                    finObj[nodeName].push(
+                      getWithAttributes(getXMLAsObj(node), node)
+                    );
+                  }
                 } else {
-                  finObj[nodeName] = [finObj[nodeName]];
-                  finObj[nodeName].push(getXMLAsObj(node));
+                  finObj[nodeName] = getWithAttributes(getXMLAsObj(node), node);
                 }
-              } else {
-                finObj[nodeName] = getXMLAsObj(node);
+              } else if (nodeType === 3) {
+                strObj += node.nodeValue;
               }
-            } else if (nodeType === 3) {
-              strObj += node.nodeValue;
-            }
-          } while ((node = node.nextSibling));
+            } while ((node = node.nextSibling));
+          }
+          return isStr ? strObj : finObj;
         }
-        return isStr ? strObj : finObj;
       }
 
       return getXMLAsObj(xmlObj);
