@@ -1,5 +1,5 @@
 // Filename: simpleConvertXML.js  
-// Timestamp: 2013.04.30-21:22:16 (last modified)  
+// Timestamp: 2013.05.12-23:18:25 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)  
 
 var simpleConvertXML = module.exports = (function () {
@@ -143,7 +143,8 @@ var simpleConvertXML = module.exports = (function () {
             if (attrArr.length) {
               newObj = {};
               for (x = attrArr.length; x--;) {
-                newObj[attrArr[x].nodeValue] = val;//attrArr[x].nodeValue;
+                //newObj[attrArr[x].nodeValue] = val;
+                newObj[attrArr[x].name] = attrArr[x].nodeValue;                
               }                                      
             }
           } else {
