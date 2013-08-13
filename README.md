@@ -145,19 +145,19 @@ Documented problems related to the conversion of xml to json using this script. 
 
  > *node.js environment*
 
- ```javascript
- var DOMParser = require('xmldom').DOMParser,
-     simpleConvertXML = require('simpleConvertXML');
- 
- xmlNode = new DOMParser().parseFromString(xmlFormattedStr);
- obj = simpleConvertXML.getXMLAsObj(xmlNode);
- ```
+  ```javascript
+  var DOMParser = require('xmldom').DOMParser,
+      simpleConvertXML = require('simpleConvertXML');
+  
+  xmlNode = new DOMParser().parseFromString(xmlFormattedStr);
+  obj = simpleConvertXML.getXMLAsObj(xmlNode);
+  ```
 
  *browser environment*
  
- ```javascript
- obj = simpleConvertXML.getXMLAsObj(xmlNode);
- ```   
+  ```javascript
+  obj = simpleConvertXML.getXMLAsObj(xmlNode);
+  ```   
    
 ---------------------------------------------------------
 #### <a id="methods">METHODS:   
