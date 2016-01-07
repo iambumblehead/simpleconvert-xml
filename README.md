@@ -21,7 +21,7 @@ There are situations where useful mapping of xml to json is not possible. Notabl
 [1]: https://developers.google.com/gdata/docs/json    "gdata-standard"
 [2]: https://npmjs.org/package/xmldom                         "xmldom"
 [3]: https://github.com/magento/magento2/tree/master/lib/Zend/Locale/Data
-[4]: https://raw.githubusercontent.com/iambumblehead/es5classic/master/es5classic_240x240.png
+[4]: https://raw.githubusercontent.com/iambumblehead/es5classic/master/es5classic_120x120.png
 
 ---------------------------------------------------------
 #### <a id="install"></a>install
