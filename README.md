@@ -2,6 +2,8 @@ simpleconvert-xml
 =================
 **(c)[Bumblehead][0], 2013,2014,2015,2016** [MIT-license](#license)
 
+[![es5 classic][4]][4]
+
 ### overview
 
 simpleconvert-xml will convert xml nodes into a javascript object or it will convert a javascript object into xml nodes.
@@ -14,8 +16,6 @@ What's good about simpleconvert-xml:
 It is not a comprehensive solution for xml conversion. See the examples below to find out what scenarious this script is best for.
 
 There are situations where useful mapping of xml to json is not possible. Notable problems have been found when converting the [ZEND locale][3] xml files. See the [problems](problems) section for more details.
-
-[![es5 classic][4]][4]
 
 [0]: http://www.bumblehead.com                            "bumblehead"
 [1]: https://developers.google.com/gdata/docs/json    "gdata-standard"
