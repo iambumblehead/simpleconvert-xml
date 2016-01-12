@@ -85,8 +85,7 @@ simpleconvertxml.getObjAsXMLstr(
      '</currencies>'
    ].join('\n'), 'text/xml');
     
-   simpleconvertxml.getXMLAsObj(xmlnode_currencies)
-   
+   simpleconvertxml.getXMLAsObj(xmlnode_currencies);
    //{
    //  "currencies": {
    //    "currency": [
