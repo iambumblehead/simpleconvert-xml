@@ -1,5 +1,5 @@
 // Filename: simpleConvertXML.js  
-// Timestamp: 2013.05.13-01:58:53 (last modified)  
+// Timestamp: 2016.01.11-20:51:48 (last modified)
 // Author(s): Bumblehead (www.bumblehead.com)  
 
 var simpleConvertXML = module.exports = (function () {
@@ -16,18 +16,7 @@ var simpleConvertXML = module.exports = (function () {
   // DOCUMENT_FRAGMENT_NODE      : 11,
   // NOTATION_NODE               : 12
 
-  function isArray (obj) {
-    if (typeof obj === 'object' && obj) {
-      if (!(obj.propertyIsEnumerable('length'))) {
-        return typeof obj.length === 'number';
-      }
-    }
-    return false;
-  }
-
   return {
-    isArray : isArray,
-
     // input:                               output:
     //  data = {                             <data>
     //    price : "$15.87",                    <price>$15.87</price>
@@ -39,10 +28,12 @@ var simpleConvertXML = module.exports = (function () {
     //    isfinal : "true"                     <isFinal>true</isFinal>
     //  }                                    </data>
     //
-    getObjAsXMLstr : function (data) {
+    getObjAsXMLstr : function (data, indent) {
       var xmlStr = '<?xml version="1.0" encoding="UTF-8"?>\n',
           nodeParentStr = '<:name>\n:v<\/:name>\n',
           nodeLeafStr = '<:name>:v<\/:name>\n';
+
+      indent = indent || '';
 
       function getAsNodeLeaf(name, content) {
         return nodeLeafStr
@@ -57,7 +48,7 @@ var simpleConvertXML = module.exports = (function () {
       }
 
       function getNode(name, content) {
-        if (isArray(content)) {
+        if (Array.isArray(content)) {
           return content.map(function (p) {
             return getNode(name, p);
           }).join('');          
@@ -68,7 +59,7 @@ var simpleConvertXML = module.exports = (function () {
         }
       }
 
-      function getNodeTree(obj) {
+      function getNodeTree(obj, i) {
         var xmlStr = "";
 
         if (obj && typeof obj === "object") {
@@ -76,13 +67,13 @@ var simpleConvertXML = module.exports = (function () {
             xmlStr += getNode(name, obj[name]);
           } 
         } else if (typeof obj === 'string') {
-          xmlStr += obj.toString();
+          xmlStr += obj;
         }
 
         return xmlStr;
       }
 
-      xmlStr += getNodeTree(data);
+      xmlStr += getNodeTree(data, indent);
 
       return xmlStr;
     },
@@ -107,23 +98,18 @@ var simpleConvertXML = module.exports = (function () {
     //  </data>                              }
     //
     getXMLAsObj : function (xmlObj) {
-      var isArray = this.isArray;
-
       function getNodeAsArr(nodeChild) {
         var nodeObj = getXMLAsObj(nodeChild),
             nodeName = nodeChild.nodeName, finObj;
 
         // property names are unknown here, 
         // and so for-loop is used
-        for (var o in nodeObj) {
-          if (nodeObj.hasOwnProperty(o)) {
-            if (isArray(nodeObj[o])) {
-              finObj = nodeObj[o];
-            } else {
-              finObj = [nodeObj[o]];
-            }
-          }
-        }  
+        if (Array.isArray(nodeObj)) {
+          finObj = nodeObj;
+        } else {
+          finObj = [nodeObj];
+        }
+
         return finObj;
       }
 
@@ -132,7 +118,7 @@ var simpleConvertXML = module.exports = (function () {
       function getWithAttributes(val, node) {
         var attrArr = node.attributes, attr, x, newObj;
         if (attrArr) {
-          if (isArray(val)) {
+          if (Array.isArray(val)) {
             newObj = val;
           } else if (typeof val === 'object') {
             newObj = val;
@@ -159,8 +145,7 @@ var simpleConvertXML = module.exports = (function () {
 
       function getXMLAsObj(node) {
         var nodeName, nodeType, 
-            strObj = "", finObj = {}, isStr = true, x,
-            attr, attrArr;
+            strObj = "", finObj = {}, isStr = true, x;
 
         if (node) {
           if (node.hasChildNodes()) {
@@ -171,12 +156,12 @@ var simpleConvertXML = module.exports = (function () {
               if (nodeType === 1) {
                 isStr = false;
                 // if array trigger, make this an array
-                if (nodeName.match(/Arr\b/)) { 
+                if (nodeName.match(/Arr$/)) { 
                   finObj[nodeName] = getNodeAsArr(node);
                 } else if (finObj[nodeName]) { 
                   // if array already formed, push item to array
                   // else a repeated node, redefine this as an array
-                  if (isArray(finObj[nodeName])) {
+                  if (Array.isArray(finObj[nodeName])) {
                     // if attribute... define on first attribute
                     finObj[nodeName].push(
                       getWithAttributes(getXMLAsObj(node), node)

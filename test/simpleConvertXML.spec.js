@@ -1,8 +1,13 @@
-var SimpleConvertXML = require('../simpleConvertXML'),
+// Filename: simpleConvertXML.spec.js  
+// Timestamp: 2016.01.11-21:14:16 (last modified)
+// Author(s): bumblehead <chris@bumblehead.com>
+
+var simpleconvertxml = require('../simpleConvertXML'),
     DOMParser = require('xmldom').DOMParser,
     CompareObj = require('compareobj');
 
-describe("SimpleConvertXML.getXMLAsObj", function () {
+
+describe("simpleconvertxml.getXMLAsObj", function () {
   var result, resultExpected;
 
   it("should convert an xml node into an object", function () {
@@ -36,7 +41,7 @@ describe("SimpleConvertXML.getXMLAsObj", function () {
 
 
     testDoc = new DOMParser().parseFromString(testXMLStr);
-    result = SimpleConvertXML.getXMLAsObj(testDoc);
+    result = simpleconvertxml.getXMLAsObj(testDoc);
     
     
     expect( 
@@ -75,7 +80,7 @@ describe("SimpleConvertXML.getXMLAsObj", function () {
 
 
     testDoc = new DOMParser().parseFromString(testXMLStr);
-    result = SimpleConvertXML.getXMLAsObj(testDoc);
+    result = simpleconvertxml.getXMLAsObj(testDoc);
 
     expect( 
       CompareObj.isSameMembersDefinedSame(
@@ -86,7 +91,7 @@ describe("SimpleConvertXML.getXMLAsObj", function () {
   });
 });
 
-describe("SimpleConvertXML.getObjAsXMLstr", function () {
+describe("simpleconvertxml.getObjAsXMLstr", function () {
   var result, resultExpected;
 
   it("should convert an object into an xml-like str", function () {
@@ -104,7 +109,7 @@ describe("SimpleConvertXML.getObjAsXMLstr", function () {
       } 
     };
 
-    result = SimpleConvertXML.getObjAsXMLstr(testObj);    
+    result = simpleconvertxml.getObjAsXMLstr(testObj);    
 
     resultExpected = "" +
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
@@ -122,6 +127,148 @@ describe("SimpleConvertXML.getObjAsXMLstr", function () {
       "</data>\n";
 
     expect( result ).toBe( resultExpected );
+  });
+
+});
+
+
+describe("convertxml", function () {
+
+  it("should pass the readme example", function () {
+    
+    var xmlnode = new DOMParser().parseFromString([
+      "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+      "<data>",
+      "  <price>$15.98</price>",
+      "  <happy>",
+      "    <say>I'm happy</say>",
+      "    <respond>you're happy</respond>",
+      "    <conclude>we're all happy</conclude>",
+      "  </happy>",
+      "  <isFinal>true</isFinal>",
+      "  <name>dave</name>",
+      "  <name>chris</name>",
+      "  <fooArr>value</fooArr>",
+      "</data>"
+    ].join('\n'), 'text/xml');
+
+    simpleconvertxml.getXMLAsObj(xmlnode);
+    //{
+    //  "data": {
+    //    "price": "$15.98",
+    //    "happy": {
+    //      "say": "I'm happy",
+    //      "respond": "you're happy",
+    //      "conclude": "we're all happy"
+    //    },
+    //    "isFinal": "true",
+    //    "name": [
+    //      "dave",
+    //      "chris"
+    //    ],
+    //    "fooArr": [
+    //      "value"
+    //    ]
+    //  }
+    //}
+
+    simpleconvertxml.getObjAsXMLstr(
+      simpleconvertxml.getXMLAsObj(xmlnode)
+    );
+    //<?xml version="1.0" encoding="UTF-8"?>
+    //<data>
+    //<price>$15.98</price>
+    //<happy>
+    //<say>I'm happy</say>
+    //<respond>you're happy</respond>
+    //<conclude>we're all happy</conclude>
+    //</happy>
+    //<isFinal>true</isFinal>
+    //<name>dave</name>
+    //<name>chris</name>
+    //<fooArr>value</fooArr>
+    //</data>
+
+    var xmlnode_currencies = new DOMParser().parseFromString([
+      '<currencies>',
+      '  <currency type="GNS">',
+      '    <displayName>syli guineano</displayName>',
+      '  </currency>',
+      '  <currency type="GNB">',
+      '    <displayName>ekuele de Guinea Ecuatorial</displayName>',
+      '    <displayName>other</displayName>',
+      '  </currency>',
+      '</currencies>'
+    ].join('\n'), 'text/xml');    
+
+    simpleconvertxml.getXMLAsObj(xmlnode_currencies);
+
+    //{
+    //  "currencies": {
+    //    "currency": [
+    //      {
+    //        "displayName": "syli guineano",
+    //        "type": "GNS"
+    //      },
+    //      {
+    //        "displayName": [
+    //          "ekuele de Guinea Ecuatorial",
+    //          "other"
+    //        ],
+    //        "type": "GNB"
+    //      }
+    //    ]
+    //  }
+    //}
+
+
+    var xmlnode_types = new DOMParser().parseFromString([
+      '<types>',
+      '  <type type="big5han" key="collation">orden del chino tradicional - Big5</type>',
+      '  <type type="buddhist" key="calendar">calendario budista</type>',
+      '</types>'
+    ].join('\n'), 'text/xml');    
+    
+    simpleconvertxml.getXMLAsObj(xmlnode_types);
+    //{
+    //  "types": {
+    //    "type": [
+    //      {
+    //        "collation": "orden del chino tradicional - Big5",
+    //        "big5han": "orden del chino tradicional - Big5"
+    //      },
+    //      {
+    //        "calendar": "calendario budista",
+    //        "buddhist": "calendario budista"
+    //      }
+    //    ]
+    //  }
+    //}    
+
+
+    var xmlnode_empty = new DOMParser().parseFromString([
+      '<identity>',
+      '  <version number="$Revision: 1.128 $"/>',
+      '  <generation date="$Date: 2009/06/15 03:46:25 $"/>',
+      '  <language type="es"/>',
+      '</identity>'
+    ].join('\n'), 'text/xml');    
+
+    simpleconvertxml.getXMLAsObj(xmlnode_empty);
+    //{
+    //  "identity": {
+    //    "version": {
+    //      "number": "$Revision: 1.128 $"
+    //    },
+    //    "generation": {
+    //      "date": "$Date: 2009/06/15 03:46:25 $"
+    //    },
+    //    "language": {
+    //      "type": "es"
+    //    }
+    //  }
+    //}
+    
   });
 
 });
