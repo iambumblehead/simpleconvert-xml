@@ -2,7 +2,7 @@
   "name": "simpleconvert-xml",
   "main": "simpleConvertXML",
   "license" : "MIT",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/iambumblehead/simpleconvert-xml.git"
@@ -10,7 +10,10 @@
   "keywords": [
     "convert",
     "xml",
-    "xml to json"
+    "xml to json",
+    "convert xml",
+    "xml conversion",
+    "xml to javascript"
   ],
   "devDependencies" : {
     "xmldom" : ">=0.1.15",
